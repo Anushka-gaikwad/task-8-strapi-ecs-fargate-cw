@@ -96,4 +96,4 @@ Get the Public IP of the running task
 
 Open:
 
-http://<public-ip>:1337/admin
+http://public-ip:1337/admin
