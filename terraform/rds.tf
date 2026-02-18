@@ -4,8 +4,8 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 
-resource "aws_db_instance" "strapi_db" {
-  identifier              = "strapi-db"
+resource "aws_db_instance" "sejal_db" {
+  identifier              = "sejal-db"
   engine                  = "postgres"
   instance_class          = "db.t3.micro"
   allocated_storage       = 20
