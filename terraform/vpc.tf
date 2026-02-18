@@ -32,10 +32,16 @@ resource "aws_route" "default_route" {
   gateway_id             = aws_internet_gateway.gw.id
 }
 
-resource "aws_route_table_association" "public_assoc" {
-  subnet_id      = aws_subnet.public_subnet.id
+resource "aws_route_table_association" "public_assoc_1" {
+  subnet_id      = aws_subnet.public_subnet_1.id
   route_table_id = aws_route_table.public_rt.id
 }
+
+resource "aws_route_table_association" "public_assoc_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
 
 resource "aws_security_group" "ecs_sg" {
   vpc_id = aws_vpc.main.id
