@@ -1,0 +1,18 @@
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "strapi-db-subnet-group"
+  subnet_ids = [aws_subnet.public_subnet.id]
+}
+
+resource "aws_db_instance" "strapi_db" {
+  identifier              = "strapi-db"
+  engine                  = "postgres"
+  instance_class          = "db.t3.micro"
+  allocated_storage       = 20
+  username                = var.db_username
+  password                = var.db_password
+  skip_final_snapshot     = true
+  multi_az                = false
+  publicly_accessible     = false
+  db_subnet_group_name    = aws_db_subnet_group.db_subnet_group.name
+  vpc_security_group_ids  = [aws_security_group.ecs_sg.id]
+}
