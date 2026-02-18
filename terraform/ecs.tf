@@ -31,24 +31,33 @@ resource "aws_ecs_task_definition" "sejal_task" {
         protocol      = "tcp"
       }]
 
-      environment = [
-        {
-          name  = "DATABASE_HOST"
-          value = aws_db_instance.sejal_db.address
-        },
-        {
-          name  = "DATABASE_PORT"
-          value = "5432"
-        },
-        {
-          name  = "DATABASE_USERNAME"
-          value = var.db_username
-        },
-        {
-          name  = "DATABASE_PASSWORD"
-          value = var.db_password
-        }
-      ]
+     environment = [
+  {
+    name  = "DATABASE_CLIENT"
+    value = "postgres"
+  },
+  {
+    name  = "DATABASE_HOST"
+    value = aws_db_instance.sejal_db.address
+  },
+  {
+    name  = "DATABASE_PORT"
+    value = "5432"
+  },
+  {
+    name  = "DATABASE_NAME"
+    value = "postgres"
+  },
+  {
+    name  = "DATABASE_USERNAME"
+    value = var.db_username
+  },
+  {
+    name  = "DATABASE_PASSWORD"
+    value = var.db_password
+  }
+]
+
     }
   ])
 }
