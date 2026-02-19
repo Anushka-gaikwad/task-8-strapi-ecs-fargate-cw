@@ -1,14 +1,23 @@
+<<<<<<< HEAD
 name: CI - Build & Push to ECR
 
 on:
   push:
     branches: [ main ]
+=======
+name: CI - Build & Push Image
+
+on:
+  push:
+    branches: [main]
+>>>>>>> 2c12d9fd (Added CI/CD  workflow)
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+<<<<<<< HEAD
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -38,3 +47,26 @@ jobs:
         with:
           name: ecr-image
           path: ecr-image.txt
+=======
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/sejal-ecs-task:$IMAGE_TAG ./strapi
+          docker push $ECR_REGISTRY/sejal-ecs-task:$IMAGE_TAG
+>>>>>>> 2c12d9fd (Added CI/CD  workflow)

@@ -1,8 +1,10 @@
-name: Deploy Strapi ECS EC2
+name: CD - Deploy Strapi ECS
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["CI - Build & Push Image"]
+    types:
+      - completed
 
 jobs:
   deploy:
@@ -25,28 +27,16 @@ jobs:
       - name: Terraform Init
         run: |
           cd terraform
-           terraform init -reconfigure
+          terraform init -reconfigure
 
-      - name: Terraform Apply (Create ECR + Infra)
+      - name: Terraform Apply (Create Infra)
         run: |
           cd terraform
           terraform apply -auto-approve \
             -var="image_url=dummy"
 
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build and Push Docker Image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/sejal-ecs-task:$IMAGE_TAG ./strapi
-          docker push $ECR_REGISTRY/sejal-ecs-task:$IMAGE_TAG
-
-      - name: Terraform Apply (Update Task with Real Image)
+      - name: Terraform Apply (Update with Real Image)
         run: |
           cd terraform
           terraform apply -auto-approve \
-            -var="image_url=${{ steps.login-ecr.outputs.registry }}/sejal-ecs-task:${{ github.sha }}"
+            -var="image_url=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sejal-ecs-task:${{ github.sha }}"
