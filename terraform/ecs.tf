@@ -66,6 +66,10 @@ resource "aws_ecs_task_definition" "sejal_task" {
     value = var.db_password
   },
   {
+  name  = "DATABASE_SSL"
+  value = "true"
+},
+  {
     name  = "APP_KEYS"
     value = "key1,key2,key3,key4"
   },
