@@ -1,23 +1,27 @@
-<<<<<<< HEAD
+
 name: CI - Build & Push to ECR
 
 on:
   push:
     branches: [ main ]
-=======
 name: CI - Build & Push Image
 
 on:
   push:
     branches: [main]
->>>>>>> 2c12d9fd (Added CI/CD  workflow)
+name: CI - Build & Deploy Image
+
+on:
+  workflow_run:
+    workflows: ["CD - Create Infrastructure"]
+    types:
+      - completed
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-<<<<<<< HEAD
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -47,7 +51,6 @@ jobs:
         with:
           name: ecr-image
           path: ecr-image.txt
-=======
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -69,4 +72,10 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/sejal-ecs-task:$IMAGE_TAG ./strapi
           docker push $ECR_REGISTRY/sejal-ecs-task:$IMAGE_TAG
->>>>>>> 2c12d9fd (Added CI/CD  workflow)
+
+      - name: Update ECS Task with Real Image
+        run: |
+          cd terraform
+          terraform init -reconfigure
+          terraform apply -auto-approve \
+            -var="image_url=${{ steps.login-ecr.outputs.registry }}/sejal-ecs-task:${{ github.sha }}"
