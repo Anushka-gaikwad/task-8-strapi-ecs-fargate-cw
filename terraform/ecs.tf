@@ -84,6 +84,18 @@ resource "aws_ecs_task_definition" "sejal_task" {
   {
     name  = "JWT_SECRET"
     value = "jwtsecret123"
+  },
+  {
+    name  = "HOST"
+    value = "0.0.0.0"
+  },
+  {
+    name  = "PORT"
+    value = "1337"
+  },
+  {
+    name  = "NODE_ENV"
+    value = "production"
   }
 ]
     }
