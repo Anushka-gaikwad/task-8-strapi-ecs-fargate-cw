@@ -1,4 +1,4 @@
-name: CI - Build & Push to ECR
+name: CI - Build & Push to Docker Hub
 
 on:
   push:
@@ -8,33 +8,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: us-east-1
-      ECR_REPOSITORY: strapi-repo
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push Docker image
+      - name: Build and push Docker image
         run: |
-          IMAGE_TAG=${GITHUB_SHA::8}   # short SHA for uniqueness
-          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
+          IMAGE_TAG=${GITHUB_SHA::8}   # first 8 chars of commit SHA
+          IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/strapi-test:$IMAGE_TAG
+          docker build -t $IMAGE_NAME ./my-strapi
+          docker push $IMAGE_NAME
           
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI
-          docker push $IMAGE_URI
-
-          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV  # pass to CD
+          # Save image name for CD workflow
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 

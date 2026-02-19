@@ -1,8 +1,7 @@
 name: CD - Terraform Deploy
 
 on:
-  push:
-    branches: [ main ]   # triggers automatically after CI
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -31,9 +30,9 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
-        run: terraform plan -var="image_url=${{ env.IMAGE_URI }}"
+        run: terraform plan -var="image_url=${{ env.IMAGE_NAME }}"
 
       - name: Terraform Apply
         working-directory: terraform
-        run: terraform apply -auto-approve -var="image_url=${{ env.IMAGE_URI }}"
+        run: terraform apply -auto-approve -var="image_url=${{ env.IMAGE_NAME }}"
 
