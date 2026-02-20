@@ -1,56 +1,27 @@
-########################
-# ECS Cluster
-########################
-resource "aws_ecs_cluster" "main" {
-  name = "strapi-cluster"
+data "aws_ecs_cluster" "existing" {
+  cluster_name = var.ecs_cluster_name
 }
 
-########################
-# Security Group
-########################
-resource "aws_security_group" "ecs_sg" {
-  name        = "strapi-sg"
-  description = "Allow HTTP traffic to Strapi"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = 1337
-    to_port     = 1337
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "strapi-sg"
-  }
-}
-
-########################
-# Task Definition
-########################
 resource "aws_ecs_task_definition" "strapi" {
   family                   = "strapi-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  execution_role_arn       = var.task_role_arn
+  task_role_arn            = var.task_role_arn
 
   container_definitions = jsonencode([
     {
       name  = "strapi"
-      image = var.image_url
+      image = var.ecr_image_url
+      cpu   = 512
+      memory = 1024
+      essential = true
       portMappings = [
         {
           containerPort = 1337
-          protocol      = "tcp"
+          hostPort      = 1337
         }
       ]
       logConfiguration = {
@@ -72,22 +43,16 @@ resource "aws_ecs_task_definition" "strapi" {
   ])
 }
 
-########################
-# ECS Service
-########################
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = data.aws_ecs_cluster.existing.id
   task_definition = aws_ecs_task_definition.strapi.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = aws_subnet.public[*].id
-    security_groups  = [aws_security_group.ecs_sg.id]
+    subnets          = var.subnet_ids
+    security_groups  = var.security_group_ids
     assign_public_ip = true
   }
-
-  depends_on = [aws_iam_role_policy_attachment.ecs_execution_policy]
 }
-

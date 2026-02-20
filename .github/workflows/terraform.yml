@@ -2,6 +2,10 @@ name: CD - Terraform Deploy
 
 on:
   workflow_dispatch:
+  # Optional: trigger after CI pushes
+  # workflow_run:
+  #   workflows: ["CI - Build & Push to ECR"]
+  #   types: [completed]
 
 jobs:
   terraform:
@@ -30,9 +34,8 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
-        run: terraform plan -var="image_url=${{ env.IMAGE_NAME }}"
+        run: terraform plan -var="ecr_image_url=${{ env.IMAGE_NAME }}"
 
       - name: Terraform Apply
         working-directory: terraform
-        run: terraform apply -auto-approve -var="image_url=${{ env.IMAGE_NAME }}"
-
+        run: terraform apply -auto-approve -var="ecr_image_url=${{ env.IMAGE_NAME }}"
