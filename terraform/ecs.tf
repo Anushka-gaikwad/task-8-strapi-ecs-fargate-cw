@@ -106,7 +106,7 @@ resource "aws_ecs_task_definition" "sejal_task" {
 # ECS SERVICE (FARGATE)
 ############################
 resource "aws_security_group" "ecs_sg" {
-  name        = "sejal-ecs-service-sg"
+  name        = "sejal-ecs-sg"
   description = "Allow traffic from ALB to ECS"
   vpc_id      = data.aws_vpc.selected.id
 
