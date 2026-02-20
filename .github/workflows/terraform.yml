@@ -8,20 +8,47 @@ on:
 
 jobs:
   terraform:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download ECR image URL artifact
-        uses: actions/download-artifact@v4
+      - name: Download artifact from CI workflow
+        uses: actions/github-script@v7
         with:
-          name: ecr-image
-          path: ./temp
+          script: |
+            const run_id = context.payload.workflow_run.id;
 
-      - name: Set IMAGE_NAME environment variable
-        run: echo "ECR_IMAGE_URL=$(cat ./temp/ecr-image.txt)" >> $GITHUB_ENV
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run_id,
+            });
+
+            const artifact = artifacts.data.artifacts.find(a => a.name === "ecr-image");
+
+            if (!artifact) {
+              core.setFailed("Artifact not found");
+              return;
+            }
+
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: artifact.id,
+              archive_format: 'zip',
+            });
+
+            const fs = require('fs');
+            fs.writeFileSync('artifact.zip', Buffer.from(download.data));
+
+      - name: Unzip artifact
+        run: unzip artifact.zip
+
+      - name: Set ECR_IMAGE_URL
+        run: echo "ECR_IMAGE_URL=$(cat ecr-image.txt)" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -43,4 +70,4 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform
-        run: terraform apply -auto-approve -var="ecr_image_url=${{ env.ECR_IMAGE_URL }}
+        run: terraform apply -auto-approve -var="ecr_image_url=${{ env.ECR_IMAGE_URL }}"
