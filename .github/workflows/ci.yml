@@ -22,9 +22,7 @@ jobs:
         run: |
           IMAGE_TAG=${GITHUB_SHA::8}   # first 8 chars of commit SHA
           IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/strapi-test:$IMAGE_TAG
-          docker build -t $IMAGE_NAME ./my-strapi
+          docker build -t $IMAGE_NAME .   # point to repo root where Dockerfile exists
           docker push $IMAGE_NAME
-          
-          # Save image name for CD workflow
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
