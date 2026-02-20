@@ -140,7 +140,7 @@ resource "aws_ecs_service" "sejal_service" {
   network_configuration {
   subnets          = data.aws_subnets.default.ids
   security_groups  = [aws_security_group.ecs_sg.id]
-  assign_public_ip = false
+  assign_public_ip = true
 }
   depends_on = [
     aws_lb_listener.ecs_listener
