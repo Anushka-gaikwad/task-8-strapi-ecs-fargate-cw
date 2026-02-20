@@ -114,7 +114,7 @@ resource "aws_ecs_service" "sejal_service" {
   desired_count   = 1
 
   network_configuration {
-  subnets          = data.aws_vpc.selected.ids
+  subnets          = data.aws_subnets.default.ids
   security_groups  = [aws_security_group.ecs_sg.id]
   assign_public_ip = true
 }
