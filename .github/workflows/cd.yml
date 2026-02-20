@@ -7,7 +7,7 @@ on:
 jobs:
   infra:
     runs-on: ubuntu-latest
-  env:
+    env:
       TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
       TF_VAR_image_url: dummy
 
