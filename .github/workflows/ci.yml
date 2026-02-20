@@ -31,10 +31,14 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
+          # Save to environment variable
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
-      - name: Upload ECR_IMAGE_URL for CD
+      - name: Save ECR image URL to file for CD
+        run: echo "${{ github.env.IMAGE_NAME }}" > ecr-image.txt
+
+      - name: Upload ECR image URL artifact
         uses: actions/upload-artifact@v4
         with:
           name: ecr-image
-          path: ${{ github.env.IMAGE_NAME }}
+          path: ecr-image.txt

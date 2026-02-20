@@ -14,14 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download IMAGE_NAME
+      - name: Download ECR image URL artifact
         uses: actions/download-artifact@v4
         with:
           name: ecr-image
           path: ./temp
 
-      - name: Set IMAGE_NAME
-       run: echo "ECR_IMAGE_URL=$(cat ./temp/image-name)" >> $GITHUB_ENV
+      - name: Set IMAGE_NAME environment variable
+        run: echo "ECR_IMAGE_URL=$(cat ./temp/ecr-image.txt)" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -43,4 +43,4 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform
-        run: terraform apply -auto-approve -var="ecr_image_url=${{ env.ECR_IMAGE_URL }}"
+        run: terraform apply -auto-approve -var="ecr_image_url=${{ env.ECR_IMAGE_URL }}
