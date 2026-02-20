@@ -21,6 +21,10 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
+      TF_VAR_image_url: dummy
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
