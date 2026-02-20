@@ -2,8 +2,8 @@
 # USE DEFAULT VPC
 ########################################
 
-data "aws_vpc" "default" {
-  default = true
+data "aws_vpc" "selected" {
+  id = "vpc-0295253d470704295"
 }
 
 ########################################
@@ -13,7 +13,7 @@ data "aws_vpc" "default" {
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+    values = [data.aws_vpc.selected.id]
   }
 }
 
@@ -23,7 +23,7 @@ data "aws_subnets" "default" {
 
 resource "aws_security_group" "ecs_sg" {
   name   = "sejal-ecs-sg"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = data.aws_vpc.selected.id
 
   ingress {
     from_port   = 1337
