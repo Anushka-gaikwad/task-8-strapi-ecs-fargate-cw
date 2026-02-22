@@ -1,12 +1,15 @@
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "sejal-db-subnet-group"
-  subnet_ids = data.aws_subnets.default.ids
+  name       = "anushka-db-subnet-group"
+  subnet_ids = [
+  "subnet-0537457522152aa2d",
+  "subnet-0fbd6ace1bb63c1c1"
+]
 }
 
 resource "aws_security_group" "rds_sg" {
-  name        = "sejal-rds-sg"
+  name        = "anushka-rds-sg"
   description = "Allow ECS to connect to RDS"
-  vpc_id      = data.aws_vpc.selected.id
+  vpc_id = "vpc-02394aac3f6ed622b"
 
   ingress {
     from_port       = 5432
@@ -22,8 +25,8 @@ resource "aws_security_group" "rds_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-resource "aws_db_instance" "sejal_db" {
-  identifier              = "sejal-db"
+resource "aws_db_instance" "anushka_db" {
+  identifier              = "anushka-db"
   engine                  = "postgres"
   instance_class          = "db.t3.micro"
   allocated_storage       = 20

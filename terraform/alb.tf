@@ -3,9 +3,9 @@
 ########################################
 
 resource "aws_security_group" "alb_sg" {
-  name        = "sejal-ecs-alb-sg"
+  name        = "anushka-ecs-alb-sg"
   description = "Allow HTTP traffic to ALB"
-  vpc_id      = data.aws_vpc.selected.id
+  vpc_id = "vpc-02394aac3f6ed622b"
 
   ingress {
     from_port   = 80
@@ -27,9 +27,12 @@ resource "aws_security_group" "alb_sg" {
 ########################################
 
 resource "aws_lb" "ecs_alb" {
-  name               = "sejal-ecs-alb"
+  name               = "anushka-ecs-alb"
   load_balancer_type = "application"
-  subnets            = data.aws_subnets.default.ids
+  subnets = [
+  "subnet-0537457522152aa2d",
+  "subnet-0fbd6ace1bb63c1c1"
+]
   security_groups    = [aws_security_group.alb_sg.id]
 
   enable_deletion_protection = false
@@ -40,10 +43,10 @@ resource "aws_lb" "ecs_alb" {
 ########################################
 
 resource "aws_lb_target_group" "ecs_tg" {
-  name        = "sejal-ecs-tg"
+  name        = "anushka-ecs-tg"
   port        = 1337
   protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.selected.id
+  vpc_id = "vpc-02394aac3f6ed622b"
   target_type = "ip"
 
   health_check {

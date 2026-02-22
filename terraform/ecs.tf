@@ -2,16 +2,16 @@
 # ECS CLUSTER
 ############################
 
-resource "aws_ecs_cluster" "sejal_cluster" {
-  name = "sejal-fargate-cluster"
+resource "aws_ecs_cluster" "anushka_cluster" {
+  name = "anushka-fargate-cluster"
 }
 
 ############################
 # TASK DEFINITION (FARGATE)
 ############################
 
-resource "aws_ecs_task_definition" "sejal_task" {
-  family                   = "sejal-fargate-task"
+resource "aws_ecs_task_definition" "anushka_task" {
+  family                   = "anushka-fargate-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "256"
@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "sejal_task" {
 
   container_definitions = jsonencode([
     {
-      name      = "sejal-container"
+      name      = "anushka-container"
       image     = var.image_url
       essential = true
 
@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "sejal_task" {
              },
   {
     name  = "DATABASE_HOST"
-    value = aws_db_instance.sejal_db.address
+    value = aws_db_instance.anushka_db.address
   },
   {
     name  = "DATABASE_PORT"
@@ -106,9 +106,9 @@ resource "aws_ecs_task_definition" "sejal_task" {
 # ECS SERVICE (FARGATE)
 ############################
 resource "aws_security_group" "ecs_sg" {
-  name        = "sejal-ecs-sg"
+  name        = "anushka-ecs-sg"
   description = "Managed by Terraform"
-  vpc_id      = data.aws_vpc.selected.id
+  vpc_id = "vpc-02394aac3f6ed622b"
 
   ingress {
     from_port       = 1337
@@ -125,20 +125,23 @@ resource "aws_security_group" "ecs_sg" {
   }
 
 }
-resource "aws_ecs_service" "sejal_service" {
-  name            = "sejal-service"
-  cluster         = aws_ecs_cluster.sejal_cluster.id
-  task_definition = aws_ecs_task_definition.sejal_task.arn
+resource "aws_ecs_service" "anushka_service" {
+  name            = "anushka-service"
+  cluster         = aws_ecs_cluster.anushka_cluster.id
+  task_definition = aws_ecs_task_definition.anushka_task.arn
   launch_type     = "FARGATE"
   desired_count   = 1
   load_balancer {
   target_group_arn = aws_lb_target_group.ecs_tg.arn
-  container_name   = "sejal-container"  
+  container_name   = "anushka-container"  
   container_port   = 1337
 }
 
   network_configuration {
-  subnets          = data.aws_subnets.default.ids
+  subnets = [
+  "subnet-0537457522152aa2d",
+  "subnet-0fbd6ace1bb63c1c1"
+]
   security_groups  = [aws_security_group.ecs_sg.id]
   assign_public_ip = true
 }

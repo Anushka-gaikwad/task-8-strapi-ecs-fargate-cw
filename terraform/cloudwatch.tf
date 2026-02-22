@@ -1,9 +1,9 @@
 resource "aws_cloudwatch_log_group" "strapi_logs" {
-  name              = "/ecs/sejal-strapi"
+  name              = "/ecs/anushka-strapi"
   retention_in_days = 7
 }
 resource "aws_cloudwatch_dashboard" "ecs_dashboard" {
-  dashboard_name = "sejal-ecs-dashboard"
+  dashboard_name = "anushka-ecs-dashboard"
 
   dashboard_body = jsonencode({
     widgets = [
@@ -16,7 +16,7 @@ resource "aws_cloudwatch_dashboard" "ecs_dashboard" {
 
         properties = {
           metrics = [
-            [ "AWS/ECS", "CPUUtilization", "ClusterName", aws_ecs_cluster.sejal_cluster.name, "ServiceName", aws_ecs_service.sejal_service.name ],
+            [ "AWS/ECS", "CPUUtilization", "ClusterName", aws_ecs_cluster.anushka_cluster.name, "ServiceName", aws_ecs_service.anushka_service.name ],
             [ ".", "MemoryUtilization", ".", ".", ".", "." ]
           ]
           period = 300
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_dashboard" "ecs_dashboard" {
 
         properties = {
           metrics = [
-            [ "AWS/ECS", "RunningTaskCount", "ClusterName", aws_ecs_cluster.sejal_cluster.name, "ServiceName", aws_ecs_service.sejal_service.name ]
+            [ "AWS/ECS", "RunningTaskCount", "ClusterName", aws_ecs_cluster.anushka_cluster.name, "ServiceName", aws_ecs_service.anushka_service.name ]
           ]
           period = 300
           stat   = "Average"
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_dashboard" "ecs_dashboard" {
 
         properties = {
           metrics = [
-            [ "AWS/ECS", "NetworkRxBytes", "ClusterName", aws_ecs_cluster.sejal_cluster.name, "ServiceName", aws_ecs_service.sejal_service.name ],
+            [ "AWS/ECS", "NetworkRxBytes", "ClusterName", aws_ecs_cluster.anushka_cluster.name, "ServiceName", aws_ecs_service.anushka_service.name ],
             [ ".", "NetworkTxBytes", ".", ".", ".", "." ]
           ]
           period = 300
